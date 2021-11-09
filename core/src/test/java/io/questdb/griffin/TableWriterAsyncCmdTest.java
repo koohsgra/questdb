@@ -24,7 +24,6 @@
 
 package io.questdb.griffin;
 
-import io.questdb.cairo.AlterStatementImpl;
 import io.questdb.cairo.CairoException;
 import io.questdb.cairo.TableReader;
 import io.questdb.cairo.TableWriter;
@@ -188,7 +187,7 @@ public class TableWriterAsyncCmdTest extends AbstractGriffinTest {
                 setUpEngineAsyncWriterEventWait(engine, commandReplySequence);
                 long commandId;
                 try (TableWriter writer = engine.getWriter(sqlExecutionContext.getCairoSecurityContext(), "product", "test lock")) {
-                    AlterStatementImpl creepyAlter = new AlterStatementImpl();
+                    AlterStatement creepyAlter = new AlterStatement();
                     creepyAlter.ofDropColumn(1, "product", writer.getMetadata().getId());
                     creepyAlter.ofDropColumn("timestamp");
                     commandId = executeAlterCommandNoWait(engine, creepyAlter, sqlExecutionContext);
@@ -301,7 +300,7 @@ public class TableWriterAsyncCmdTest extends AbstractGriffinTest {
                 try {
                     setUpEngineAsyncWriterEventWait(engine, commandReplySequence);
 
-                    AlterStatementImpl creepyAlter = new AlterStatementImpl();
+                    AlterStatement creepyAlter = new AlterStatement();
                     creepyAlter.ofDropPartition(0, "product", writer.getMetadata().getId()).ofPartition(0);
                     long commandId = executeAlterCommandNoWait(engine, creepyAlter, sqlExecutionContext);
                     engine.tick();
@@ -326,7 +325,7 @@ public class TableWriterAsyncCmdTest extends AbstractGriffinTest {
                 try {
                     setUpEngineAsyncWriterEventWait(engine, commandReplySequence);
 
-                    AlterStatementImpl creepyAlter = new AlterStatementImpl();
+                    AlterStatement creepyAlter = new AlterStatement();
                     creepyAlter.ofDropColumn(1, "product", writer.getMetadata().getId());
                     creepyAlter.ofDropColumn("timestamp").ofDropColumn("timestamp");
                     long commandId = executeAlterCommandNoWait(engine, creepyAlter, sqlExecutionContext);

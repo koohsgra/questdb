@@ -25,12 +25,13 @@
 package io.questdb.griffin;
 
 import io.questdb.cairo.CairoEngine;
-import io.questdb.cairo.sql.AlterStatement;
 import io.questdb.cairo.sql.InsertMethod;
 import io.questdb.cairo.sql.InsertStatement;
 import io.questdb.cairo.sql.RecordCursorFactory;
 import io.questdb.cutlass.text.TextLoader;
 import io.questdb.mp.SCSequence;
+
+import java.io.IOException;
 
 public class CompiledQueryImpl implements CompiledQuery {
     private final CairoEngine engine;
@@ -83,6 +84,11 @@ public class CompiledQueryImpl implements CompiledQuery {
     @Override
     public short getType() {
         return type;
+    }
+
+    @Override
+    public QueryFuture execute(SCSequence tempSequence) throws SqlException {
+        return null;
     }
 
     CompiledQuery of(RecordCursorFactory recordCursorFactory) {
@@ -151,51 +157,74 @@ public class CompiledQueryImpl implements CompiledQuery {
         return of(BACKUP_TABLE);
     }
 
-    @Override
-    public long executeAsyncNoWait() throws SqlException {
-        if (type == ALTER && alterStatement != null) {
-            return AlterCommandExecution.executeAlterCommandNoWait(
-                    engine,
-                    alterStatement,
-                    defaultSqlExecutionContext
-            );
-        } else if (type == INSERT) {
-            exeucteInsert();
-        }
-        return -1L;
-    }
-
-    @Override
-    public void executeAsyncWait(SCSequence tempSequence) throws SqlException {
-        if (type == ALTER && alterStatement != null) {
-            AlterCommandExecution.executeAlterCommand(
-                    engine,
-                    alterStatement,
-                    defaultSqlExecutionContext,
-                    tempSequence
-            );
-        } else if (type == INSERT) {
-            exeucteInsert();
-        }
-    }
-
-    @Override
-    public void executeSync() throws SqlException {
-        if (type == ALTER && alterStatement != null) {
-            AlterCommandExecution.executeAlterStatementSyncOrFail(
-                    engine,
-                    alterStatement,
-                    defaultSqlExecutionContext
-            );
-        } else if (type == INSERT) {
-            exeucteInsert();
-        }
-    }
+////    @Override
+//    public long executeAsyncNoWait() throws SqlException {
+//        if (type == ALTER && alterStatement != null) {
+//            return AlterCommandExecution.executeAlterCommandNoWait(
+//                    engine,
+//                    alterStatement,
+//                    defaultSqlExecutionContext
+//            );
+//        } else if (type == INSERT) {
+//            exeucteInsert();
+//        }
+//        return -1L;
+//    }
+//
+////    @Override
+//    public void executeAsyncWait(SCSequence tempSequence) throws SqlException {
+//        if (type == ALTER && alterStatement != null) {
+//            AlterCommandExecution.executeAlterCommand(
+//                    engine,
+//                    alterStatement,
+//                    defaultSqlExecutionContext,
+//                    tempSequence
+//            );
+//        } else if (type == INSERT) {
+//            exeucteInsert();
+//        }
+//    }
+//
+////    @Override
+//    public void executeSync() throws SqlException {
+//        if (type == ALTER && alterStatement != null) {
+//            AlterCommandExecution.executeAlterStatementSyncOrFail(
+//                    engine,
+//                    alterStatement,
+//                    defaultSqlExecutionContext
+//            );
+//        } else if (type == INSERT) {
+//            exeucteInsert();
+//        }
+//    }
 
     private void exeucteInsert() throws SqlException {
         try (InsertMethod insertMethod = insertStatement.createMethod(defaultSqlExecutionContext)) {
             insertMethod.execute();
             insertMethod.commit();
+        }
+    }
+
+    private class AlterTableQueryFutureImpl implements QueryFuture {
+
+        @Override
+        public void await() throws SqlException {
+
+        }
+
+        @Override
+        public boolean await(long timeout) throws SqlException {
+            return false;
+        }
+
+        @Override
+        public void close() throws IOException {
+
+        }
+
+        @Override
+        public boolean isDone() {
+            return false;
         }
     }
 }

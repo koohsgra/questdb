@@ -29,7 +29,6 @@ import io.questdb.cairo.EntryUnavailableException;
 import io.questdb.cairo.TableStructureChangesException;
 import io.questdb.cairo.TableWriter;
 import io.questdb.cairo.pool.WriterPool;
-import io.questdb.cairo.sql.AlterStatement;
 import io.questdb.log.Log;
 import io.questdb.log.LogFactory;
 import io.questdb.mp.FanOut;
